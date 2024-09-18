@@ -110,14 +110,14 @@ export default function AkunPage() {
 
     if (file) {
       if (!allowedTypes.includes(file.type)) {
-        setAlertMessage("")
+        setAlertMessage("Format file harus .jpeg atau .png")
         setAlertType("destructive")
         setTimeout(() => setAlertMessage(null), 3000)
         return
       }
 
       if (file.size > 100 * 1024) {
-        setAlertMessage("File size exceeds 100 KB")
+        setAlertMessage("Ukuran gambar maksimum 100 kb")
         setAlertType("destructive")
         setTimeout(() => setAlertMessage(null), 3000)
         return

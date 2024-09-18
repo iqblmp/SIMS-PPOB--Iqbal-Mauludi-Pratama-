@@ -21,7 +21,7 @@ const Hero: React.FC<HeroProps> = ({ username, balance }) => {
   const toggleBalance = () => {
     setShowBalance((prev) => !prev)
   }
-  function formatRupiah(amount: number | null): string {
+  function formatRupiah(amount: number): string {
     return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
   }
   return (
@@ -57,7 +57,10 @@ const Hero: React.FC<HeroProps> = ({ username, balance }) => {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
-            Rp {showBalance ? formatRupiah(balance) : "••••••••"}
+            Rp
+            {showBalance && balance !== null && balance !== undefined
+              ? formatRupiah(balance)
+              : "••••••••"}
           </div>
           <div className="flex items-center gap-2 pt-4">
             <p className="text-xs">
