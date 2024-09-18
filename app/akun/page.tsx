@@ -10,10 +10,11 @@ import axios from "axios"
 import { Mail, Terminal, User } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { useDispatch, useSelector } from "react-redux"
+// components
+import { HashLoader } from "react-spinners"
 import { z } from "zod"
 
 import { useFetchData } from "@/hooks/useFetchData"
-// components
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import {
@@ -47,7 +48,9 @@ export default function AkunPage() {
   const { loading, profile } = useFetchData()
   //state
   const [alertMessage, setAlertMessage] = useState<string | null>(null)
-  const [alertType, setAlertType] = useState<"success" | "error">("success")
+  const [alertType, setAlertType] = useState<"success" | "destructive">(
+    "success"
+  )
   const [isProfileLoaded, setIsProfileLoaded] = useState<boolean>(false)
   const [selectedImage, setSelectedImage] = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
@@ -84,18 +87,19 @@ export default function AkunPage() {
       )
 
       if (response.data.status == 0) {
+        setIsEditProfile(false)
         setAlertMessage(response.data.message)
         setAlertType("success")
         setTimeout(() => setAlertMessage(null), 3000)
       } else {
         setAlertMessage(response.data.message)
-        setAlertType("error")
+        setAlertType("destructive")
         setTimeout(() => setAlertMessage(null), 3000)
       }
     } catch (error: any) {
       const errorMessage = error.response?.data?.message
       setAlertMessage(errorMessage)
-      setAlertType("error")
+      setAlertType("destructive")
     }
   }
 
@@ -107,14 +111,14 @@ export default function AkunPage() {
     if (file) {
       if (!allowedTypes.includes(file.type)) {
         setAlertMessage("")
-        setAlertType("error")
+        setAlertType("destructive")
         setTimeout(() => setAlertMessage(null), 3000)
         return
       }
 
       if (file.size > 100 * 1024) {
         setAlertMessage("File size exceeds 100 KB")
-        setAlertType("error")
+        setAlertType("destructive")
         setTimeout(() => setAlertMessage(null), 3000)
         return
       }
@@ -145,7 +149,7 @@ export default function AkunPage() {
       const { status, message } = response.data
 
       setAlertMessage(message)
-      setAlertType(status === 0 ? "success" : "error")
+      setAlertType(status === 0 ? "success" : "destructive")
 
       if (status === 0) {
         setSelectedImage(null)
@@ -162,7 +166,7 @@ export default function AkunPage() {
     } catch (error: any) {
       const errorMessage = error.response?.data?.message
       setAlertMessage(errorMessage || "Upload failed")
-      setAlertType("error")
+      setAlertType("destructive")
       setTimeout(() => setAlertMessage(null), 3000)
     }
   }
@@ -170,7 +174,7 @@ export default function AkunPage() {
   if (loading || !isProfileLoaded) {
     return (
       <div className="flex h-screen items-center justify-center">
-        Loading...
+        <HashLoader color="#f13b2f" loading />
       </div>
     )
   }
@@ -203,16 +207,7 @@ export default function AkunPage() {
             onChange={handleFileChange}
             style={{ display: "none" }}
           />
-          {selectedImage && (
-            <Button
-              onClick={handleUpload}
-              type="button"
-              variant="border"
-              className=" mb-3"
-            >
-              Simpan
-            </Button>
-          )}
+
           <div className="text-3xl font-bold">
             {profile?.first_name} {profile?.last_name}
           </div>
@@ -220,7 +215,7 @@ export default function AkunPage() {
         <div className="flex items-center justify-center">
           <div className="grid gap-4  w-[50%]">
             {alertMessage && (
-              <Alert className={`alert-${alertType}`}>
+              <Alert variant={alertType}>
                 <Terminal className="h-4 w-4" />
                 <AlertTitle>
                   {alertType === "success" ? "Success!" : "Error!"}
@@ -301,35 +296,46 @@ export default function AkunPage() {
                     </FormItem>
                   )}
                 />
-                <div className="flex flex-col gap-y-4">
+                {selectedImage ? (
                   <Button
-                    onClick={() => setIsEditProfile(!isEditProfile)}
+                    onClick={handleUpload}
                     type="button"
-                    variant="border"
-                    className="w-full  "
+                    variant="destructive"
+                    className="w-full "
                   >
-                    {isEditProfile ? "Batalkan" : "Edit Profil"}
+                    Simpan
                   </Button>
-                  {isEditProfile ? (
+                ) : (
+                  <div className="flex flex-col gap-y-4">
                     <Button
-                      type="submit"
-                      variant="destructive"
-                      className="w-full "
+                      onClick={() => setIsEditProfile(!isEditProfile)}
+                      type="button"
+                      variant="border"
+                      className="w-full  "
                     >
-                      Simpan
+                      {isEditProfile ? "Batalkan" : "Edit Profil"}
                     </Button>
-                  ) : (
-                    <Link href="/logout">
+                    {isEditProfile ? (
                       <Button
-                        type="button"
+                        type="submit"
                         variant="destructive"
                         className="w-full "
                       >
-                        Logout
+                        Simpan
                       </Button>
-                    </Link>
-                  )}
-                </div>
+                    ) : (
+                      <Link href="/logout">
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          className="w-full "
+                        >
+                          Logout
+                        </Button>
+                      </Link>
+                    )}
+                  </div>
+                )}
               </form>
             </Form>
           </div>

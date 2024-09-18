@@ -53,7 +53,9 @@ export default function RegistrationdPage() {
 
   //state
   const [alertMessage, setAlertMessage] = useState<string | null>(null)
-  const [alertType, setAlertType] = useState<"success" | "error">("success")
+  const [alertType, setAlertType] = useState<"success" | "destructive">(
+    "success"
+  )
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
@@ -77,13 +79,13 @@ export default function RegistrationdPage() {
         setTimeout(() => router.push("/login"), 3000)
       } else {
         setAlertMessage(response.data.message)
-        setAlertType("error")
+        setAlertType("destructive")
         setTimeout(() => setAlertMessage(null), 3000)
       }
     } catch (error: any) {
       const errorMessage = error.response?.data?.message
       setAlertMessage(errorMessage)
-      setAlertType("error")
+      setAlertType("destructive")
     }
   }
   return (
@@ -96,7 +98,7 @@ export default function RegistrationdPage() {
             </h1>
           </div>
           {alertMessage && (
-            <Alert className={`alert-${alertType}`}>
+            <Alert variant={alertType}>
               <Terminal className="h-4 w-4" />
               <AlertTitle>
                 {alertType === "success" ? "Success!" : "Error!"}

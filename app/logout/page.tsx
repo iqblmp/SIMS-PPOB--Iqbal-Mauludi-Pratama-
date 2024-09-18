@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { clearToken } from "@/redux/sessionSlice"
 import { deleteCookie } from "cookies-next"
 import { useDispatch } from "react-redux"
+import { HashLoader } from "react-spinners"
 
 const Logout = () => {
   const dispatch = useDispatch()
@@ -23,7 +24,7 @@ const Logout = () => {
 
   return (
     <div className="flex h-screen items-center justify-center">
-      Logging out...
+      <HashLoader color="#f13b2f" loading />
     </div>
   )
 }

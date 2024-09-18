@@ -4,10 +4,6 @@ const nextConfig = {
   images: {
     domains: ["minio.nutech-integrasi.com"],
   },
-
-  //   experimental: {
-  //     middleware: true,
-  //   },
 }
 
 export default nextConfig

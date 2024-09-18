@@ -1,26 +1,24 @@
 "use client"
 
 //sources
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Image from "next/image"
+import { setBalance } from "@/redux/informationSlice"
 import { RootState } from "@/redux/store"
 import axios from "axios"
 import { Check, X } from "lucide-react"
-//hooks
-import { useSelector } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
+import { HashLoader } from "react-spinners"
 
 import { useFetchData } from "@/hooks/useFetchData"
-// components
 import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import Hero from "@/components/hero"
 import Navigation from "@/components/navigation"
@@ -34,6 +32,7 @@ type Service = {
 
 export default function IndexPage() {
   //hooks
+  const dispatch = useDispatch()
   const token = useSelector((state: RootState) => state.session.token)
   const { loading, profile, balance, services, banners } = useFetchData()
 
@@ -41,6 +40,7 @@ export default function IndexPage() {
   const [onTransaction, setOnTransaction] = useState<boolean>(false)
   const [selectedService, setSelectedService] = useState<Service | null>(null)
   const [showModal, setShowModal] = useState<boolean>(false)
+  const [paymentSuccess, setPaymentSuccess] = useState<boolean>(false)
   const [transactionStatus, setTransactionStatus] = useState<
     "pending" | "success" | "error" | null
   >(null)
@@ -50,7 +50,6 @@ export default function IndexPage() {
   })
 
   const handleTransaction = (service: Service) => {
-    console.log(service)
     setFormData({ service_code: service.service_code })
     setSelectedService(service)
     setShowModal(true)
@@ -70,9 +69,11 @@ export default function IndexPage() {
         )
 
         if (response.data.status === 0) {
+          setPaymentSuccess(true)
           setTransactionStatus("success")
           setAlertMessage(response.data.message)
         } else {
+          setPaymentSuccess(false)
           setTransactionStatus("error")
           setAlertMessage(response.data.message)
         }
@@ -83,10 +84,33 @@ export default function IndexPage() {
       }
     }
   }
+  useEffect(() => {
+    if (paymentSuccess) {
+      const fetchUpdatedBalance = async () => {
+        try {
+          const data = await axios.get(
+            `${process.env.NEXT_PUBLIC_API_URL}/balance`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          )
+          dispatch(setBalance(data.data.data.balance))
+        } catch (error) {
+          console.error("Error fetching updated balance:", error)
+        } finally {
+          setPaymentSuccess(false)
+        }
+      }
+      fetchUpdatedBalance()
+    }
+  }, [paymentSuccess, dispatch])
+
   if (loading) {
     return (
       <div className="flex h-screen items-center justify-center">
-        Loading...
+        <HashLoader color="#f13b2f" loading />
       </div>
     )
   }
@@ -121,7 +145,7 @@ export default function IndexPage() {
                   Rp.{selectedService?.service_tariff}
                 </p>
 
-                <p className="text-sm">
+                <div className="text-sm">
                   {alertMessage ? (
                     <div
                       className={`flex gap-x-2 items-center ${
@@ -136,7 +160,7 @@ export default function IndexPage() {
                   ) : (
                     "Klik Lanjutkan untuk membayar"
                   )}
-                </p>
+                </div>
               </div>
             </AlertDialogHeader>
             <AlertDialogFooter>
@@ -192,20 +216,6 @@ export default function IndexPage() {
               </div>
             ))}
         </div>
-
-        {/* <div className="flex gap-x-5">
-          {Array.isArray(banners) &&
-            banners.map((item) => (
-              <div key={item.banner_name}>
-                <Image
-                  src={item.banner_image}
-                  width={271}
-                  height={121}
-                  alt={item.description}
-                />
-              </div>
-            ))}
-        </div> */}
       </main>
     </div>
   )

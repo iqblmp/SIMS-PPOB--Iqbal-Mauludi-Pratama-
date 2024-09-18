@@ -6,13 +6,14 @@ import { setBalance } from "@/redux/informationSlice"
 import { RootState } from "@/redux/store"
 import { zodResolver } from "@hookform/resolvers/zod"
 import axios from "axios"
-import { ArrowUpIcon, CreditCard, Terminal } from "lucide-react"
+import { ArrowUpRight, CreditCard, Terminal } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { useDispatch, useSelector } from "react-redux"
+// components
+import { HashLoader } from "react-spinners"
 import { z } from "zod"
 
 import { useFetchData } from "@/hooks/useFetchData"
-// components
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -54,8 +55,10 @@ export default function TopUpPage() {
   const token = useSelector((state: RootState) => state.session.token)
   //state
   const [alertMessage, setAlertMessage] = useState<string | null>(null)
-  const [alertType, setAlertType] = useState<"success" | "error">("success")
-  const [topUpSuccess, setTopUpSuccess] = useState(false)
+  const [alertType, setAlertType] = useState<"success" | "destructive">(
+    "success"
+  )
+  const [topUpSuccess, setTopUpSuccess] = useState<boolean>(false)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -79,14 +82,14 @@ export default function TopUpPage() {
         setTimeout(() => setAlertMessage(null), 3000)
       } else {
         setAlertMessage(response.data.message)
-        setAlertType("error")
+        setAlertType("destructive")
         setTopUpSuccess(false)
         setTimeout(() => setAlertMessage(null), 3000)
       }
     } catch (error: any) {
       const errorMessage = error.response?.data?.message
       setAlertMessage(errorMessage)
-      setAlertType("error")
+      setAlertType("destructive")
       setTopUpSuccess(false)
     }
   }
@@ -103,10 +106,12 @@ export default function TopUpPage() {
               },
             }
           )
-          console.log(data.data.data.balance)
           dispatch(setBalance(data.data.data.balance))
         } catch (error) {
           console.error("Error fetching updated balance:", error)
+        } finally {
+          setTopUpSuccess(false)
+          form.reset({ top_up_amount: 0 })
         }
       }
       fetchUpdatedBalance()
@@ -116,7 +121,7 @@ export default function TopUpPage() {
   if (loading) {
     return (
       <div className="flex h-screen items-center justify-center">
-        Loading...
+        <HashLoader color="#f13b2f" loading />
       </div>
     )
   }
@@ -125,7 +130,7 @@ export default function TopUpPage() {
       <Navigation />
       <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
         {alertMessage && (
-          <Alert className={`alert-${alertType}`}>
+          <Alert variant={alertType}>
             <Terminal className="h-4 w-4" />
             <AlertTitle>
               {alertType === "success" ? "Success!" : "Error!"}
@@ -180,7 +185,7 @@ export default function TopUpPage() {
                   className="ml-auto gap-1 w-full disabled:cursor-not-allowed"
                 >
                   Top Up
-                  <ArrowUpIcon className="h-4 w-4" />
+                  <ArrowUpRight className="h-4 w-4" />
                 </Button>
               </form>
             </Form>

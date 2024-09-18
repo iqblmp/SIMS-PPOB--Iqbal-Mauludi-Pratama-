@@ -8,8 +8,9 @@ import { Provider } from "react-redux"
 import "@/styles/globals.css"
 import { fontSans } from "@/lib/fonts"
 import { cn } from "@/lib/utils"
-//components
-import { TailwindIndicator } from "@/components/tailwind-indicator"
+
+// development only
+// import { TailwindIndicator } from "@/components/tailwind-indicator"
 
 interface RootLayoutProps {
   children: React.ReactNode
@@ -19,7 +20,9 @@ export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <>
       <html lang="en" suppressHydrationWarning>
-        <head />
+        <head>
+          <link rel="shortcut icon" href="/Logo.png" />
+        </head>
         <body
           className={cn(
             "min-h-screen bg-background font-sans antialiased",
@@ -30,7 +33,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
             <div className="relative flex min-h-screen flex-col">
               <div className="flex-1">{children}</div>
             </div>
-            <TailwindIndicator />
+            {/* <TailwindIndicator /> */}
           </Provider>
         </body>
       </html>

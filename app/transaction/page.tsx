@@ -2,11 +2,10 @@
 
 //sources
 import { useEffect, useState } from "react"
-import Image from "next/image"
-import Link from "next/link"
 import { RootState } from "@/redux/store"
 import axios from "axios"
 import { useSelector } from "react-redux"
+import { HashLoader } from "react-spinners"
 
 import { useFetchData } from "@/hooks/useFetchData"
 // components
@@ -90,11 +89,13 @@ export default function TransactionPage() {
   const handleShowMore = () => {
     setOffset((prevOffset) => prevOffset + limit)
   }
-
+  function formatRupiah(amount: number): string {
+    return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
+  }
   if (loading) {
     return (
       <div className="flex h-screen items-center justify-center">
-        Loading...
+        <HashLoader color="#f13b2f" loading />
       </div>
     )
   }
@@ -127,6 +128,7 @@ export default function TransactionPage() {
                     <TableHead className="text-right">Keterangan</TableHead>
                   </TableRow>
                 </TableHeader>
+
                 <TableBody>
                   {transactions.map((transaction) => (
                     <TableRow key={transaction.invoice_number}>
@@ -139,8 +141,8 @@ export default function TransactionPage() {
                           }`}
                         >
                           {transaction.transaction_type === "TOPUP"
-                            ? `+ Rp.${transaction.total_amount}`
-                            : `- Rp.${transaction.total_amount}`}
+                            ? `+ Rp.${formatRupiah(transaction.total_amount)}`
+                            : `- Rp.${formatRupiah(transaction.total_amount)}`}
                         </div>
                         <div className="hidden text-xs text-muted-foreground md:inline">
                           {new Date(transaction.created_on).toLocaleDateString(
@@ -170,8 +172,6 @@ export default function TransactionPage() {
                   ))}
                 </TableBody>
               </Table>
-
-              {onLoad && <p>Loading...</p>}
 
               <Button
                 disabled={!isMore}

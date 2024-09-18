@@ -62,7 +62,6 @@ export const useFetchData = () => {
   //services
   const handleFetchServices = async () => {
     const data = await fetchFromApi("/services")
-    console.log(data.data)
     dispatch(setServices(data.data))
   }
 
