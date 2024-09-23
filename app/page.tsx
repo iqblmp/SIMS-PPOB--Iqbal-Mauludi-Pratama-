@@ -150,17 +150,16 @@ export default function IndexPage() {
                   Rp.{selectedService?.service_tariff}
                 </p>
 
-                <p className="text-sm">
+                <p className="text-sm font-semibold">
                   {alertMessage ? (
                     <p
-                      className={`flex gap-x-2 items-center ${
+                      className={
                         transactionStatus === "success"
                           ? "text-emerald-600"
                           : "text-rose-600"
-                      } `}
+                      }
                     >
                       {alertMessage}
-                      {transactionStatus === "success" ? <Check /> : <X />}
                     </p>
                   ) : (
                     `Klik "Lanjutkan" untuk membayar`
