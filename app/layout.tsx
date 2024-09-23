@@ -23,6 +23,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <head>
           <link rel="shortcut icon" href="/Logo.png" />
         </head>
+
         <body
           className={cn(
             "min-h-screen bg-background font-sans antialiased",

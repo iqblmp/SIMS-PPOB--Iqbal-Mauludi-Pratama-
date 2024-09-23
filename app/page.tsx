@@ -9,7 +9,11 @@ import axios from "axios"
 import { Check, X } from "lucide-react"
 import { useDispatch, useSelector } from "react-redux"
 import { HashLoader } from "react-spinners"
+// Import Swiper React components
+import { Swiper, SwiperSlide } from "swiper/react"
 
+// Import Swiper styles
+import "swiper/css"
 import { useFetchData } from "@/hooks/useFetchData"
 import {
   AlertDialog,
@@ -118,12 +122,15 @@ export default function IndexPage() {
     <div className="flex min-h-screen w-full flex-col">
       <Navigation />
       <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
+        {/* profile */}
         {profile && (
           <Hero
             username={`${profile.first_name} ${profile.last_name}`}
             balance={balance}
           />
         )}
+
+        {/* modal */}
         <AlertDialog open={showModal}>
           <AlertDialogContent>
             <AlertDialogHeader>
@@ -131,23 +138,21 @@ export default function IndexPage() {
                 Pembayaran {selectedService?.service_name} sebesar
               </AlertDialogTitle>
 
-              <div className="modal-content">
-                <div className="fixed right-5 top-5   items-center justify-end">
+              <div>
+                <div className="fixed right-5 top-5 items-center justify-end -z-10 ">
                   <img
+                    className="w-9 md:w-12"
                     src={selectedService?.service_icon}
-                    width={50}
-                    height={50}
                     alt="icon"
                   />
                 </div>
-                <p></p>
                 <p className="font-semibold text-xl pb-2">
                   Rp.{selectedService?.service_tariff}
                 </p>
 
-                <div className="text-sm">
+                <p className="text-sm">
                   {alertMessage ? (
-                    <div
+                    <p
                       className={`flex gap-x-2 items-center ${
                         transactionStatus === "success"
                           ? "text-emerald-600"
@@ -156,11 +161,11 @@ export default function IndexPage() {
                     >
                       {alertMessage}
                       {transactionStatus === "success" ? <Check /> : <X />}
-                    </div>
+                    </p>
                   ) : (
-                    "Klik Lanjutkan untuk membayar"
+                    `Klik "Lanjutkan" untuk membayar`
                   )}
-                </div>
+                </p>
               </div>
             </AlertDialogHeader>
             <AlertDialogFooter>
@@ -180,6 +185,8 @@ export default function IndexPage() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+
+        {/* services */}
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 w-full justify-center">
           {Array.isArray(services) &&
             services.map((item) => (
@@ -198,23 +205,40 @@ export default function IndexPage() {
               </div>
             ))}
         </div>
+
         <div className="font-semibold pt-1">Temukan promo menarik</div>
+
+        {/* banners */}
         <div className="flex justify-center gap-4">
-          {Array.isArray(banners) &&
-            banners.map((item) => (
-              <div
-                key={item.banner_name}
-                className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5"
-              >
-                <Image
-                  src={item.banner_image}
-                  width={271}
-                  height={121}
-                  alt={item.description}
-                  className="w-full h-auto object-cover"
-                />
-              </div>
-            ))}
+          <Swiper
+            spaceBetween={30}
+            slidesPerView={1}
+            breakpoints={{
+              640: {
+                slidesPerView: 2,
+                spaceBetween: 20,
+              },
+              768: {
+                slidesPerView: 3,
+                spaceBetween: 30,
+              },
+              1024: {
+                slidesPerView: 4,
+                spaceBetween: 30,
+              },
+            }}
+          >
+            {Array.isArray(banners) &&
+              banners.map((item) => (
+                <SwiperSlide key={item.banner_name}>
+                  <img
+                    src={item.banner_image}
+                    alt={item.description}
+                    className="w-full h-auto object-cover cursor-grab active:cursor-grabbing"
+                  />
+                </SwiperSlide>
+              ))}
+          </Swiper>
         </div>
       </main>
     </div>
