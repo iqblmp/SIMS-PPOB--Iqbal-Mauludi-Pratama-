@@ -175,9 +175,9 @@ export default function TransactionPage() {
 
               <Button
                 disabled={!isMore}
-                variant="outline"
+                // variant="outline"
                 onClick={handleShowMore}
-                className="mt-4 w-full text-destructive hover:text-destructive"
+                className="mt-4 w-full "
               >
                 Show More
               </Button>

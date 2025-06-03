@@ -1,16 +1,12 @@
 "use client"
 
-//store
+import "@/styles/globals.css"
+import { fontSans } from "@/libs/fonts"
+import { cn } from "@/libs/utils"
 import { store } from "@/redux/store"
 import { Provider } from "react-redux"
 
-//styles
-import "@/styles/globals.css"
-import { fontSans } from "@/lib/fonts"
-import { cn } from "@/lib/utils"
-
-// development only
-// import { TailwindIndicator } from "@/components/tailwind-indicator"
+import { TailwindIndicator } from "@/components/tailwind-indicator"
 
 interface RootLayoutProps {
   children: React.ReactNode
@@ -34,7 +30,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
             <div className="relative flex min-h-screen flex-col">
               <div className="flex-1">{children}</div>
             </div>
-            {/* <TailwindIndicator /> */}
+            <TailwindIndicator />
           </Provider>
         </body>
       </html>

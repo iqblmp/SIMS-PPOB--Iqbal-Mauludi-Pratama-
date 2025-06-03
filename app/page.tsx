@@ -1,38 +1,20 @@
 "use client"
 
-//sources
+import "swiper/css"
 import { useEffect, useState } from "react"
 import Image from "next/image"
 import { setBalance } from "@/redux/informationSlice"
 import { RootState } from "@/redux/store"
 import axios from "axios"
-import { Check, X } from "lucide-react"
 import { useDispatch, useSelector } from "react-redux"
 import { HashLoader } from "react-spinners"
-// Import Swiper React components
 import { Swiper, SwiperSlide } from "swiper/react"
 
-// Import Swiper styles
-import "swiper/css"
+import { Service } from "@/types/ppob"
 import { useFetchData } from "@/hooks/useFetchData"
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
 import Hero from "@/components/hero"
+import Modal from "@/components/modal"
 import Navigation from "@/components/navigation"
-
-type Service = {
-  service_code: string
-  service_name: string
-  service_icon: string
-  service_tariff: number
-}
 
 export default function IndexPage() {
   //hooks
@@ -41,7 +23,6 @@ export default function IndexPage() {
   const { loading, profile, balance, services, banners } = useFetchData()
 
   //state
-  const [onTransaction, setOnTransaction] = useState<boolean>(false)
   const [selectedService, setSelectedService] = useState<Service | null>(null)
   const [showModal, setShowModal] = useState<boolean>(false)
   const [paymentSuccess, setPaymentSuccess] = useState<boolean>(false)
@@ -109,7 +90,7 @@ export default function IndexPage() {
       }
       fetchUpdatedBalance()
     }
-  }, [paymentSuccess, dispatch])
+  }, [paymentSuccess, dispatch, token])
 
   if (loading) {
     return (
@@ -118,11 +99,11 @@ export default function IndexPage() {
       </div>
     )
   }
+
   return (
     <div className="flex min-h-screen w-full flex-col">
       <Navigation />
-      <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
-        {/* profile */}
+      <main className="flex flex-1 flex-col gap-8 p-4 md:gap-12 md:p-8">
         {profile && (
           <Hero
             username={`${profile.first_name} ${profile.last_name}`}
@@ -130,69 +111,14 @@ export default function IndexPage() {
           />
         )}
 
-        {/* modal */}
-        <AlertDialog open={showModal}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>
-                Pembayaran {selectedService?.service_name} sebesar
-              </AlertDialogTitle>
-
-              <div>
-                <div className="fixed right-5 top-5 items-center justify-end -z-10 ">
-                  <img
-                    className="w-9 md:w-12"
-                    src={selectedService?.service_icon}
-                    alt="icon"
-                  />
-                </div>
-                <p className="font-semibold text-xl pb-2">
-                  Rp.{selectedService?.service_tariff}
-                </p>
-
-                <p className="text-sm font-semibold">
-                  {alertMessage ? (
-                    <p
-                      className={
-                        transactionStatus === "success"
-                          ? "text-emerald-600"
-                          : "text-rose-600"
-                      }
-                    >
-                      {alertMessage}
-                    </p>
-                  ) : (
-                    `Klik "Lanjutkan" untuk membayar`
-                  )}
-                </p>
-              </div>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel
-                onClick={() => {
-                  setShowModal(false)
-                  setAlertMessage(null)
-                }}
-              >
-                {!alertMessage ? "Batalkan" : "Kembali ke Beranda"}
-              </AlertDialogCancel>
-              {!alertMessage && (
-                <AlertDialogAction onClick={handleSubmit}>
-                  Lanjutkan
-                </AlertDialogAction>
-              )}
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-
         {/* services */}
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 w-full justify-center">
+        <div className=" grid w-full grid-cols-2 justify-center gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6  xl:grid-cols-12 ">
           {Array.isArray(services) &&
             services.map((item) => (
               <div
                 key={item.service_code}
                 onClick={() => handleTransaction(item)}
-                className="cursor-pointer flex flex-col items-center"
+                className="flex cursor-pointer flex-col items-center"
               >
                 <Image
                   src={item.service_icon}
@@ -200,45 +126,56 @@ export default function IndexPage() {
                   height={70}
                   alt={item.service_name}
                 />
-                <p className="text-center text-sm mt-2">{item.service_name}</p>
+                <p className="mt-2 text-center text-sm">{item.service_name}</p>
               </div>
             ))}
         </div>
 
-        <div className="font-semibold pt-1">Temukan promo menarik</div>
-
         {/* banners */}
-        <div className="flex justify-center gap-4">
-          <Swiper
-            spaceBetween={30}
-            slidesPerView={1}
-            breakpoints={{
-              640: {
-                slidesPerView: 2,
-                spaceBetween: 20,
-              },
-              768: {
-                slidesPerView: 3,
-                spaceBetween: 30,
-              },
-              1024: {
-                slidesPerView: 4,
-                spaceBetween: 30,
-              },
-            }}
-          >
-            {Array.isArray(banners) &&
-              banners.map((item) => (
-                <SwiperSlide key={item.banner_name}>
-                  <img
-                    src={item.banner_image}
-                    alt={item.description}
-                    className="w-full h-auto object-cover cursor-grab active:cursor-grabbing"
-                  />
-                </SwiperSlide>
-              ))}
-          </Swiper>
+        <div className="flex flex-col gap-5">
+          <div className=" font-semibold">Temukan promo menarik</div>
+          <div className="flex justify-center gap-4">
+            <Swiper
+              spaceBetween={30}
+              slidesPerView={1}
+              breakpoints={{
+                640: {
+                  slidesPerView: 2,
+                  spaceBetween: 20,
+                },
+                768: {
+                  slidesPerView: 3,
+                  spaceBetween: 30,
+                },
+                1024: {
+                  slidesPerView: 4,
+                  spaceBetween: 30,
+                },
+              }}
+            >
+              {Array.isArray(banners) &&
+                banners.map((item) => (
+                  <SwiperSlide key={item.banner_name}>
+                    <img
+                      src={item.banner_image}
+                      alt={item.description}
+                      className="w-full h-auto object-cover cursor-grab active:cursor-grabbing"
+                    />
+                  </SwiperSlide>
+                ))}
+            </Swiper>
+          </div>
         </div>
+
+        <Modal
+          showModal={showModal}
+          alertMessage={alertMessage}
+          selectedService={selectedService}
+          transactionStatus={transactionStatus}
+          setShowModal={setShowModal}
+          setAlertMessage={setAlertMessage}
+          handleSubmit={handleSubmit}
+        />
       </main>
     </div>
   )

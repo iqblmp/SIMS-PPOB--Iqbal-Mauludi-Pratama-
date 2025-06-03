@@ -1,11 +1,10 @@
 "use client"
 
 import React, { useState } from "react"
-import Image from "next/image"
+import { formatRupiah } from "@/utils/formatter"
 import { DollarSign, Eye, EyeOff } from "lucide-react"
 
 import { useFetchData } from "@/hooks/useFetchData"
-//components
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 type HeroProps = {
@@ -15,19 +14,16 @@ type HeroProps = {
 
 const Hero: React.FC<HeroProps> = ({ username, balance }) => {
   const { profile } = useFetchData()
-  //state
   const [showBalance, setShowBalance] = useState<boolean>(true)
-  //function
+
   const toggleBalance = () => {
     setShowBalance((prev) => !prev)
   }
-  function formatRupiah(amount: number): string {
-    return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
-  }
+
   return (
     <div className="grid gap-4  md:gap-8 lg:grid-cols-2">
       <Card className="border-none shadow-none">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-0 py-0">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 py-0">
           <CardTitle className="text-base font-medium ">
             {profile && (
               <img
@@ -50,14 +46,14 @@ const Hero: React.FC<HeroProps> = ({ username, balance }) => {
           <div className="text-3xl font-bold">{username}</div>
         </CardContent>
       </Card>
-      <Card className="bg-balance bg-cover text-white rounded-2xl">
+      <Card className="rounded-2xl bg-balance bg-cover text-white ">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Saldo anda</CardTitle>
-          <DollarSign className="h-4 w-4 " />
+          <DollarSign className="size-4" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
-            Rp
+            Rp{" "}
             {showBalance && balance !== null && balance !== undefined
               ? formatRupiah(balance)
               : "••••••••"}
@@ -68,9 +64,9 @@ const Hero: React.FC<HeroProps> = ({ username, balance }) => {
             </p>
             <button onClick={toggleBalance}>
               {showBalance ? (
-                <EyeOff className="h-4 w-4" />
+                <EyeOff className="size-4" />
               ) : (
-                <Eye className="h-4 w-4" />
+                <Eye className="size-4" />
               )}
             </button>
           </div>
